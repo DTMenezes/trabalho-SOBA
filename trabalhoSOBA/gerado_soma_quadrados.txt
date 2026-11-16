@@ -1,0 +1,55 @@
+# Codigo de maquina gerado para testes/soma_quadrados.lbs
+# (make disasm LBS=testes/soma_quadrados.lbs)
+
+#   function
+#   v0 = p0 * p0
+#   ret v0
+#   end
+#   function
+#   zret p0 $0
+#   v0 = p0 - $1
+#   v1 = call 0 p0
+#   v0 = call 1 v0
+#   v0 = v0 + v1
+#   ret v0
+#   end
+
+0000000000000000 <.data>:
+   0:	55                   	push   %rbp
+   1:	48 89 e5             	mov    %rsp,%rbp
+   4:	48 83 ec 20          	sub    $0x20,%rsp
+   8:	89 7d e8             	mov    %edi,-0x18(%rbp)
+   b:	8b 45 e8             	mov    -0x18(%rbp),%eax
+   e:	0f af 45 e8          	imul   -0x18(%rbp),%eax
+  12:	89 45 fc             	mov    %eax,-0x4(%rbp)
+  15:	8b 45 fc             	mov    -0x4(%rbp),%eax
+  18:	c9                   	leave
+  19:	c3                   	ret
+  1a:	c9                   	leave
+  1b:	c3                   	ret
+  1c:	55                   	push   %rbp
+  1d:	48 89 e5             	mov    %rsp,%rbp
+  20:	48 83 ec 20          	sub    $0x20,%rsp
+  24:	89 7d e8             	mov    %edi,-0x18(%rbp)
+  27:	83 7d e8 00          	cmpl   $0x0,-0x18(%rbp)
+  2b:	75 07                	jne    0x34
+  2d:	b8 00 00 00 00       	mov    $0x0,%eax
+  32:	c9                   	leave
+  33:	c3                   	ret
+  34:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  37:	2d 01 00 00 00       	sub    $0x1,%eax
+  3c:	89 45 fc             	mov    %eax,-0x4(%rbp)
+  3f:	8b 7d e8             	mov    -0x18(%rbp),%edi
+  42:	e8 b9 ff ff ff       	call   0x0
+  47:	89 45 f8             	mov    %eax,-0x8(%rbp)
+  4a:	8b 7d fc             	mov    -0x4(%rbp),%edi
+  4d:	e8 ca ff ff ff       	call   0x1c
+  52:	89 45 fc             	mov    %eax,-0x4(%rbp)
+  55:	8b 45 fc             	mov    -0x4(%rbp),%eax
+  58:	03 45 f8             	add    -0x8(%rbp),%eax
+  5b:	89 45 fc             	mov    %eax,-0x4(%rbp)
+  5e:	8b 45 fc             	mov    -0x4(%rbp),%eax
+  61:	c9                   	leave
+  62:	c3                   	ret
+  63:	c9                   	leave
+  64:	c3                   	ret

@@ -1,0 +1,43 @@
+0000000000000000 <prologo>:
+   0:	55                   	push   %rbp
+   1:	48 89 e5             	mov    %rsp,%rbp
+   4:	48 83 ec 20          	sub    $0x20,%rsp
+   8:	89 7d e8             	mov    %edi,-0x18(%rbp)
+
+000000000000000b <carrega_eax>:
+   b:	8b 45 fc             	mov    -0x4(%rbp),%eax
+   e:	8b 45 ec             	mov    -0x14(%rbp),%eax
+  11:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  14:	b8 64 00 00 00       	mov    $0x64,%eax
+  19:	b8 f6 ff ff ff       	mov    $0xfffffff6,%eax
+
+000000000000001e <opera_memoria>:
+  1e:	03 45 f8             	add    -0x8(%rbp),%eax
+  21:	2b 45 f8             	sub    -0x8(%rbp),%eax
+  24:	0f af 45 f8          	imul   -0x8(%rbp),%eax
+
+0000000000000028 <opera_constante>:
+  28:	05 e8 03 00 00       	add    $0x3e8,%eax
+  2d:	2d e8 03 00 00       	sub    $0x3e8,%eax
+  32:	69 c0 e8 03 00 00    	imul   $0x3e8,%eax,%eax
+
+0000000000000038 <salva_eax>:
+  38:	89 45 fc             	mov    %eax,-0x4(%rbp)
+  3b:	89 45 f4             	mov    %eax,-0xc(%rbp)
+
+000000000000003e <zret>:
+  3e:	83 7d f8 00          	cmpl   $0x0,-0x8(%rbp)
+  42:	75 05                	jne    49 <call>
+  44:	8b 45 fc             	mov    -0x4(%rbp),%eax
+  47:	c9                   	leave
+  48:	c3                   	ret
+
+0000000000000049 <call>:
+  49:	8b 7d f4             	mov    -0xc(%rbp),%edi
+  4c:	bf 05 00 00 00       	mov    $0x5,%edi
+  51:	e8 aa ff ff ff       	call   0 <prologo>
+  56:	89 45 f8             	mov    %eax,-0x8(%rbp)
+
+0000000000000059 <ret_e_end>:
+  59:	c9                   	leave
+  5a:	c3                   	ret

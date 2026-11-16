@@ -1,0 +1,206 @@
+INF1018 - Software Basico - Trabalho 2026.2
+Gerador de Codigo com Funcoes
+
+Integrantes:
+  Nome_do_Aluno1  Matricula  Turma
+  Nome_do_Aluno2  Matricula  Turma
+
+
+1. O que esta funcionando
+
+Todos os comandos da linguagem LBS foram implementados e testados:
+
+  - atribuicao com +, - e *, usando qualquer combinacao de variavel local,
+    parametro e constante (inclusive constante negativa e constante dos dois lados)
+  - chamada de funcao (call), tanto para funcoes anteriores quanto recursiva
+  - retorno incondicional (ret)
+  - retorno condicional (zret), no inicio, no meio da funcao ou varios na mesma funcao
+  - arquivos com varias funcoes, sendo chamada a ultima
+
+As variaveis locais e uma copia do parametro ficam na pilha, em posicoes fixas
+em relacao a %rbp. O parametro chega em %edi e e salvo na pilha no prologo, ja que
+%edi e reaproveitado para passar o argumento nos calls. O codigo gerado so usa
+%eax e %edi, que sao caller-saved, entao nao precisamos salvar outros registradores.
+
+Quando o primeiro operando do zret e uma constante, a decisao e feita na hora de
+gerar o codigo: se for zero vira um ret direto, se nao for zero nao gera nada.
+
+A leitura das linhas aceita os comandos com ou sem espacos entre os simbolos.
+
+
+2. O que nao esta funcionando
+
+Nao encontramos nenhum caso com erro nos testes que fizemos.
+
+Como o enunciado garante que a entrada esta sempre correta, nao fizemos
+tratamento de erro no arquivo LBS. Linhas que nao sao reconhecidas so geram
+um aviso em stderr e sao ignoradas.
+
+O resultado das operacoes segue a aritmetica de 32 bits da maquina, entao
+overflow da a volta normalmente (ex.: 2147483647 * 2 = -2).
+
+
+3. Testes realizados
+
+Para cada caso rodamos a funcao com alguns argumentos e comparamos com o valor
+esperado. Tambem conferimos o codigo gerado com objdump para ver se os bytes
+batiam com as instrucoes que planejamos.
+
+3.1 Exemplos do enunciado
+
+  function
+  ret $100
+  end
+  -> f(42) = 100
+
+  function
+  v0 = p0 + $1
+  ret v0
+  end
+  -> f(5) = 6, f(-1) = 0
+
+  Fatorial:
+  function
+  zret p0 $1
+  v0 = p0 + $0
+  v1 = v0 - $1
+  v1 = call 0 v1
+  v0 = v0 * v1
+  ret v0
+  end
+  -> f(0) = 1, f(1) = 1, f(5) = 120, f(10) = 3628800
+
+  Soma dos quadrados:
+  function
+  v0 = p0 * p0
+  ret v0
+  end
+  function
+  zret p0 $0
+  v0 = p0 - $1
+  v1 = call 0 p0
+  v0 = call 1 v0
+  v0 = v0 + v1
+  ret v0
+  end
+  -> f(0) = 0, f(3) = 14, f(10) = 385
+
+3.2 Testes nossos
+
+  Retorna o parametro:
+  function
+  ret p0
+  end
+  -> f(-77) = -77
+
+  Constantes negativas:
+  function
+  v0 = p0 * $-3
+  v1 = v0 - $-10
+  ret v1
+  end
+  -> f(4) = -2, f(-5) = 25
+
+  So constantes:
+  function
+  v0 = $5 * $-4
+  v1 = $7 - $10
+  v2 = v0 + v1
+  ret v2
+  end
+  -> f(0) = -23
+
+  Usando as 5 variaveis:
+  function
+  v0 = p0 + $1
+  v1 = v0 * $2
+  v2 = v1 - p0
+  v3 = v2 * v2
+  v4 = v3 + v0
+  ret v4
+  end
+  -> f(3) = 29
+
+  zret no meio da funcao:
+  function
+  v0 = p0 - $5
+  zret v0 $500
+  v1 = p0 * $10
+  ret v1
+  end
+  -> f(5) = 500, f(6) = 60
+
+  zret com constante zero (sempre retorna):
+  function
+  zret $0 p0
+  ret $-1
+  end
+  -> f(8) = 8
+
+  zret com constante diferente de zero (nunca retorna):
+  function
+  zret $3 $999
+  v0 = p0 * p0
+  ret v0
+  end
+  -> f(9) = 81
+
+  Fibonacci (dois zret e duas chamadas recursivas):
+  function
+  zret p0 $0
+  v0 = p0 - $1
+  zret v0 $1
+  v1 = call 0 v0
+  v2 = v0 - $1
+  v2 = call 0 v2
+  v3 = v1 + v2
+  ret v3
+  end
+  -> f(0) = 0, f(1) = 1, f(10) = 55, f(20) = 6765
+
+  Tres funcoes encadeadas, com call passando constante:
+  function
+  v0 = p0 * $2
+  ret v0
+  end
+  function
+  v0 = call 0 p0
+  v0 = v0 + $3
+  ret v0
+  end
+  function
+  v0 = call 1 p0
+  v1 = call 0 $7
+  v2 = call 1 $-2
+  v0 = v0 + v1
+  v0 = v0 + v2
+  ret v0
+  end
+  -> f(4) = 24
+
+  Recursao profunda:
+  function
+  zret p0 $0
+  v0 = p0 - $1
+  v0 = call 0 v0
+  v0 = v0 + $1
+  ret v0
+  end
+  -> f(1000) = 1000
+
+  Overflow:
+  function
+  v0 = p0 * $2147483647
+  ret v0
+  end
+  -> f(2) = -2
+
+  Sem espacos entre os simbolos:
+  function
+  v0=p0+$1
+  v1=v0*$-2
+  ret v1
+  end
+  -> f(4) = -10
+
+Todos os 27 casos deram o resultado esperado.
